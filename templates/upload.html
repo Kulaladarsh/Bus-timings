@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Timing{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{% if timing %}Update{% else %}Add{% endif %} Bus Timing</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="upload-form">
+        {% if timing %}
+            <input type="hidden" name="entry_id" value="{{ timing._id }}">
+        {% else %}
+            <div class="form-group">
+                <label for="passcode">Admin Passcode:</label>
+                <input type="password" name="passcode" id="passcode" placeholder="Enter Admin Passcode" required>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <input type="text" name="bus_no" placeholder="Bus Number" required value="{{ timing.bus_no if timing else '' }}">
+        </div>
+        <div class="form-group">
+            <input type="text" name="bus_name" placeholder="Bus Name" required value="{{ timing.bus_name if timing else '' }}">
+        </div>
+        <div class="form-group">
+            <input type="text" name="stop_name" placeholder="Stop Name" required value="{{ timing.stop_name if timing else '' }}">
+        </div>
+        <div class="form-group">
+            <input type="text" name="arrival_time" placeholder="Arrival Time (e.g. 1:30 PM)" required value="{{ timing.arrival_time if timing else '' }}">
+        </div>
+        <div class="form-group">
+            <input type="text" name="decepture_time" placeholder="Departure Time (e.g. 1:45 PM)" required value="{{ timing.decepture_time if timing else '' }}">
+        </div>
+        <div class="form-group">
+            <select name="direction" required>
+                <option value="" disabled {% if not timing %}selected{% endif %}>Select Direction</option>
+                <option value="Ajekar to Udupi" {% if timing and timing.direction == 'Ajekar to Udupi' %}selected{% endif %}>
+                    Ajekar to Udupi
+                </option>
+                <option value="Udupi to Ajekar" {% if timing and timing.direction == 'Udupi to Ajekar' %}selected{% endif %}>
+                    Udupi to Ajekar
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="text" name="submitted_by" placeholder="Your Name (required)" required value="{{ timing.submitted_by if timing else '' }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">
+                {% if timing %}✅ Update{% else %}➕ Submit{% endif %}
+            </button>
+
+            {% if timing %}
+                <a href="{{ url_for('view_direction', direction=timing.direction) }}" class="btn btn-cancel">Cancel</a>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn btn-back">⬅️ Back</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

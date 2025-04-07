@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ direction }} Timings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ direction }} - Bus Timings (Editable)</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Editable Table -->
+    <div class="table-responsive">
+        <table class="bus-table">
+            <thead>
+                <tr>
+                    <th>Bus No</th>
+                    <th>Bus Name</th>
+                    <th>Stop Name</th>
+                    <th>Arrival Time</th>
+                    <th>Decepture Time</th>
+                    <th>Submitted By</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stop in stops %}
+                <tr>
+                    <td>{{ stop.bus_no or '' }}</td>
+                    <td>{{ stop.bus_name }}</td>
+                    <td>{{ stop.stop_name }}</td>
+                    <td>{{ stop.arrival_time }}</td>
+                    <td>{{ stop.decepture_time }}</td>
+                    <td>{{ stop.submitted_by or 'Anonymous' }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('edit_entry', entry_id=stop._id) }}" class="btn-edit">Edit</a>
+                        <a href="{{ url_for('delete_entry', entry_id=stop._id) }}" class="btn-delete" onclick="return confirm('Are you sure?');">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="center" style="margin-bottom: 40px;">
+        <a href="{{ url_for('upload') }}" class="btn">+ Add New</a>
+    </div>
+
+    <!-- Simplified Table View -->
+    <h2>{{ direction }} - Simple View</h2>
+    <div class="table-responsive">
+        <table class="bus-table">
+            <thead>
+                <tr>
+                    <th>Bus Name</th>
+                    <th>Bus No</th>
+                    <th>Stop</th>
+                    <th>Arrival Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr>
+                    <td>{{ r.bus_name }}</td>
+                    <td>{{ r.bus_no }}</td>
+                    <td>{{ r.stop_name }}</td>
+                    <td>{{ r.arrival_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back Button -->
+    <div class="center" style="margin-top: 20px;">
+        <a href="{{ url_for('index') }}" class="btn">⬅️ Back</a>
+    </div>
+</div>
+{% endblock %}
