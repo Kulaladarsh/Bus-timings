@@ -3,11 +3,14 @@
 {% block title %}Bus Timings Home{% endblock %}
 
 {% block content %}
+
+<div class="fullscreen-image-wrapper">
+    <img src="{{ url_for('static', filename='images.jpeg') }}" alt="Full Screen Image">
+</div>
+
 <div class="container">
-    <h2>Bus Timings</h2>
-    <div style="text-align: center; margin-top: 20px;">
-        <img src="{{ url_for('static', filename='images.jpeg') }}" alt="Logo" width="200">
-    </div>
+   <center> <h2>🚌 Never miss your bus again! ⏰ Check live timings, plan your trip with ease, and travel stress-free. ✅</h2></center
+    
     
     
     <div class="search-container">
@@ -21,26 +24,21 @@
             <button type="submit">🔍</button>
         </form> 
     </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <a href="{{ url_for('view_direction', direction='Ajekar to Udupi') }}" 
-           class="btn" 
-           style="padding: 10px 15px; background: #007BFF; color: white; text-decoration: none; border-radius: 5px;">
-          Ajekar to Udupi
+    
+    <section class="direction-buttons">
+        <a href="{{ url_for('view_direction', direction='Ajekar to Udupi') }}" class="btn btn-blue">
+            Ajekar to Udupi
         </a>
-      
-        <a href="{{ url_for('upload') }}" 
-           class="btn" 
-           style="padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px;">
-          + Add New Timing
+    
+        <a href="{{ url_for('upload') }}" class="btn btn-green">
+            + Add New Timing
         </a>
-      
-        <a href="{{ url_for('view_direction', direction='Udupi to Ajekar') }}" 
-           class="btn" 
-           style="padding: 10px 15px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px;">
-          Udupi to Ajekar
+    
+        <a href="{{ url_for('view_direction', direction='Udupi to Ajekar') }}" class="btn btn-gray">
+            Udupi to Ajekar
         </a>
-    </div>
+    </section>
+    
 
     <div id="search-results" class="search-results">
         <!-- Results will be displayed here -->
