@@ -5,40 +5,135 @@
 {% block content %}
 
 <div class="fullscreen-image-wrapper">
-    <img src="{{ url_for('static', filename='images.jpeg') }}" alt="Full Screen Image">
+    <img src="{{ url_for('static', filename='images/images (2).jpeg') }}" alt="Full Screen Image">
 </div>
 
 <div class="container">
-   <center> <h2>🚌 Never miss your bus again! ⏰ Check live timings, plan your trip with ease, and travel stress-free. ✅</h2></center
-    
-    
-    
+    <center>
+        <h2>🚌 Never miss your bus again! ⏰ Check live timings, plan your trip with ease, and travel stress-free. ✅</h2>
+    </center>
+
     <div class="search-container">
         <form action="{{ url_for('search') }}" method="get" class="search-bar">
             <select name="destination">
                 <option value="Ajekar to Udupi">Ajekar to Udupi</option>
                 <option value="Udupi to Ajekar">Udupi to Ajekar</option>
             </select>
-    
-            <input type="text" name="stop" placeholder="Choose Your Stop">
-            <button type="submit">🔍</button>
-        </form> 
+
+            <input type="text" name="stop" placeholder="Choose Your Stop" value="{{ selected_stop or '' }}" required>
+
+            <button type="submit">🔍 Search</button>
+        </form>
     </div>
+
+    <!--css-->
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
     
+        thead {
+            background-color: #4CAF50;
+            color: white;
+        }
+    
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+    
+        h2 {
+            color: #333;
+            margin-top: 30px;
+        }
+    
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-top: 20px;
+        }
+    
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+    
+            thead tr {
+                display: none;
+            }
+    
+            td {
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+    
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+    {% if buses %}
+    <h2>Results for "{{ selected_direction }}" at "{{ selected_stop }}"</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Bus Name</th>
+                <th>Bus Number</th>
+                <th>Stop</th>
+                <th>Arrival Time</th>
+                <th>Departure Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bus in buses %}
+            <tr>
+                <td>{{ bus.bus_name }}</td>
+                <td>{{ bus.bus_no }}</td>
+                <td>{{ bus.stop_name }}</td>
+                <td>{{ bus.arrival_time }}</td>
+                <td>{{ bus.decepture_time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif selected_direction and selected_stop %}
+    <p>No matching buses found.</p>
+    {% endif %}
+
     <section class="direction-buttons">
         <a href="{{ url_for('view_direction', direction='Ajekar to Udupi') }}" class="btn btn-blue">
             Ajekar to Udupi
         </a>
-    
+
         <a href="{{ url_for('upload') }}" class="btn btn-green">
             + Add New Timing
         </a>
-    
+
         <a href="{{ url_for('view_direction', direction='Udupi to Ajekar') }}" class="btn btn-gray">
             Udupi to Ajekar
         </a>
     </section>
-    
 
     <div id="search-results" class="search-results">
         <!-- Results will be displayed here -->

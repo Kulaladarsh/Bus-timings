@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>❌ Delete Bus Timing</h2>
+
+    {% if timing %}
+    <hr>
+    <div class="delete-section">
+        <h3>Are you sure?</h3>
+        <form method="POST" action="{{ url_for('delete_timing', entry_id=timing._id) }}">
+            <p>
+                Are you sure you want to delete <strong>{{ timing.bus_name }}</strong> at 
+                <strong>{{ timing.stop_name }}</strong> ({{ timing.arrival_time }})?
+            </p>
+
+            <div class="form-group">
+                <label for="passcode">Admin Passcode:</label>
+                <input type="password" name="passcode" required>
+            </div>
+
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{{ url_for('view_direction', direction=timing.direction) }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    {% else %}
+        <p>No timing found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Bus Timings{% endblock %}</title>
+    <title>{% block title %}Bus Schedules{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
-        <h1>Bus Timings Website</h1>
+        <h1 class="bus-title">Bus Timings Website</h1>
+
+
+          
     </header>
 
     <main>
@@ -15,7 +18,17 @@
     </main>
 
     <footer>
-        <p>Bus Timings Website 2025 | Developed by Adarsh kulal | <a href="https://instagram.com/your_instagram">Follow on Instagram</a></p>
+        <p>
+            
+                    Bus Timings Website 2025 | Developed by Adarsh Kulal | Follow On
+                    <a href="https://instagram.com/ada.rshkulal" target="_blank" style="display: inline-flex; align-items: center; gap: 5px; text-decoration: none; color: white;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" style="width: 20px; height: 20px;">
+                        
+                    </a>
+               
+            
+        </p>
     </footer>
+    
 </body>
 </html>

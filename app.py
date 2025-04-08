@@ -5,24 +5,25 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY') or 'dev-secret-key'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
 # MongoDB setup
 client = MongoClient('mongodb://localhost:27017/')
 db = client['bus_timings']
-# pyright: ignore[reportUndefinedVariable]
 timings_collection = db['timings']
-
 
 PASS_CODE = "8861"
 
+# Helper function to verify admin passcode
 def verify_passcode(passcode):
     return passcode == PASS_CODE
 
+# Home route
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# Upload form
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
@@ -57,30 +58,37 @@ def upload():
 
     return render_template('upload.html')
 
+# ✅ Search route - corrected to filter by selected direction and stop
 @app.route('/search')
 def search():
-    destination = request.args.get('destination')
-    term = request.args.get('term')
+    destination = request.args.get('destination')  # e.g., "Ajekar to Udupi"
+    stop_name = request.args.get('stop')           # e.g., "Perdoor"
 
-    if not destination or not term:
-        return jsonify([])
+    buses = []
 
-    results = list(timings_collection.find({
-        'direction': destination,
-        '$or': [
-            {'bus_no': {'$regex': term, '$options': 'i'}},
-            {'bus_name': {'$regex': term, '$options': 'i'}},
-            {'stop_name': {'$regex': term, '$options': 'i'}}
-        ]
-    }).sort('arrival_time', 1))
+    if destination and stop_name:
+        # Match both direction and stop_name with case-insensitive regex
+        query = {
+            "direction": {"$regex": f"^{destination}$", "$options": "i"},
+            "stop_name": {"$regex": stop_name, "$options": "i"}
+        }
+        try:
+            buses = list(timings_collection.find(query).sort("arrival_time", 1))
+        except Exception as e:
+            flash(f"❌ Error fetching data: {e}", 'error')
+            buses = []
+    else:
+        buses = []
 
-    return jsonify(results)
+    return render_template('index.html', buses=buses, selected_direction=destination, selected_stop=stop_name)
 
+# View all timings for a direction
 @app.route('/view/<direction>')
 def view_direction(direction):
     stops = list(timings_collection.find({'direction': direction}).sort('arrival_time', 1))
     return render_template('view.html', direction=direction, stops=stops)
 
+# Edit existing entry
 @app.route('/edit/<entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
     timing = timings_collection.find_one({'_id': ObjectId(entry_id)})
@@ -123,24 +131,32 @@ def edit_entry(entry_id):
 
     return render_template('upload.html', timing=timing)
 
+# Delete a timing
 @app.route('/delete/<entry_id>', methods=["GET", "POST"])
-def delete_entry(entry_id):
+def delete_timing(entry_id):
     timing = timings_collection.find_one({'_id': ObjectId(entry_id)})
     if not timing:
         flash('❌ Timing not found!', 'error')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        if not verify_passcode(request.form.get('passcode', '')):
-            flash('❌ Invalid admin passcode!', 'error')
-            return redirect(url_for('view_direction', direction=timing['direction']))
+        passcode = request.form.get('passcode', '')
+        if not verify_passcode(passcode):
+            flash('❌ Invalid admin passcode!', 'danger')
+            return redirect(url_for('delete_timing', entry_id=entry_id))
 
-        direction = timing['direction']
-        timings_collection.delete_one({'_id': ObjectId(entry_id)})
-        flash('🗑️ Timing deleted successfully!', 'success')
-        return redirect(url_for('view_direction', direction=direction))
+        result = timings_collection.delete_one({'_id': ObjectId(entry_id)})
+        if result.deleted_count:
+            flash('🗑️ Timing deleted successfully!', 'success')
+        else:
+            flash('⚠️ Failed to delete timing.', 'danger')
 
-    return render_template('confirm_delete.html', timing=timing)
+        return redirect(url_for('view_direction', direction=timing['direction']))
 
+    # Render the delete confirmation form
+    return render_template('delete.html', timing=timing)
+
+
+# Run app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
